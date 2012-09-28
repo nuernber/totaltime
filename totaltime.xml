@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+<ModulePrefs title="Weekly Time Totals">
+  <Optional feature="google.calendar-0.5"/>
+  <Optional feature="google.calendar-0.5.read"/>
+</ModulePrefs>
+<Content type="html"><![CDATA[
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<body style="font-size:10pt; font-face: Verdana;">
+<script>
+function eventInArray(a, eventTitle)
+{
+  for(title in a) {
+    if (title == eventTitle) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// {year: 2010, month: 1, date: 3, hour: 0, minute: 0, second: 0}
+function getTimeDiffInHours(start, end)
+{
+  // only count events that occur within this week...
+  var length = 0;
+  // TODO: for now just assume events go on in <= 1 day
+  if(end.hour == 0)
+    end.hour = 24;
+  length += end.hour - start.hour;
+  if(length > 0)
+  {
+    // check for 1 less than hour
+    if(end.minute < start.minute)
+    {
+      length -= 1;
+      length += (60 + (end.minute - start.minute)) / 60;
+    } else {
+      length += (end.minute - start.minute) / 60;
+    }
+  } else {
+    length = (end.minute - start.minute) / 60;
+  }
+  return length;
+}
+
+function eventCallback(response) {
+  var my_events = new Array();
+  //var out1 = '';
+  //for(prop in response)
+  //{
+  //  out1 += prop + " value: " + response[prop] + '\n';
+  //}
+  //alert(out1);
+  var events = response[0]['events'];
+  var out = '';
+  for(var i = 0; i < events.length; ++i) {
+    var e = events[i];
+    if ('title' in e) {
+      var time_length = getTimeDiffInHours(e.startTime, e.endTime);
+      //(e.endTime['hour'] - e.startTime['hour'])
+      if(eventInArray(my_events, e.title)) {
+        my_events[e.title] += time_length;
+      } else {
+        my_events[e.title] = time_length;
+      }
+    }
+  }
+  for(title in my_events) {
+    var num = my_events[title];
+    num = num.toFixed(2);
+    out += title + ": " + num + " hours";
+    //out += "<br>";
+    out += "\n";
+  }
+  //document.body.innerHTML += out;
+  document.getElementById("times").value += out + "\n";
+}
+
+function getWeekStart()
+{
+  var now = google.calendar.utils.getNow();
+  var mtime = now.getTime();
+  mtime -= now.getDay() * 24 * 60 * 60 * 1000; // get beginning of week
+  var start = new Date();
+  start.setTime(mtime);
+  start.setHours(0);
+  start.setMinutes(0);
+  start.setSeconds(0);
+  start.setMilliseconds(0);
+  return google.calendar.utils.fromDate(start);
+}
+
+function getWeekEnd()
+{
+  var now = google.calendar.utils.getNow();
+  var mtime = now.getTime();
+  mtime += (7 - now.getDay()) * 24 * 60 * 60 * 1000; // get beginning of week
+  var end = new Date();
+  end.setTime(mtime);
+  end.setHours(0);
+  end.setMinutes(0);
+  end.setSeconds(0);
+  end.setMilliseconds(0);
+  return google.calendar.utils.fromDate(end);
+}
+
+//var startDate = {year: 2010, month: 1, date: 3, hour: 0, minute: 0, second: 0};
+//var endDate = {year: 2010, month: 1, date:10, hour: 0, minute: 0, second: 0};
+
+function readEvents()
+{
+  var calendar_id = document.getElementById("eventid").value;
+  google.calendar.read.getEvents(eventCallback, [calendar_id], getWeekStart(), getWeekEnd());
+}
+</script>
+Calendar ID:
+<input type="text" id="eventid"/><br/>
+<input type="button" onclick="readEvents()" value="Refresh"/><br/>
+<a href="http://bit.ly/OsO3ka" target="_blank">
+How to use</a><br/>
+<textarea id="times" style="font-size:8pt; font-face: Verdana;" cols="18" rows="7"></textarea>
+</body>
+</html>
+]]></Content>
+</Module>
