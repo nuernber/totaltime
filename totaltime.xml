@@ -146,6 +146,7 @@ function eventCallback(response) {
 
   var y = document.createElement("TR");
   y.setAttribute("id", "weekly_row_" + i);
+  y.setAttribute("style", "background-color: #444; color: white;");
   document.getElementById("weeklyTotalTable").appendChild(y);
 
   var z = document.createElement("TD");
