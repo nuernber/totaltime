@@ -87,10 +87,9 @@ function eventCallback(response) {
 
     if (currentDayOfMonth != my_event_days[title])
     {
-      currentDayOfMonth = my_event_days[title];
-
       var y = document.createElement("TR");
       y.setAttribute("id", "weekly_row_" + i);
+	  y.setAttribute("style", "background-color: #444; color: white;");
       document.getElementById("weeklyTotalTable").appendChild(y);
 
       var z = document.createElement("TD");
@@ -113,6 +112,7 @@ function eventCallback(response) {
 
       i++;
 
+      currentDayOfMonth = my_event_days[title];
       totalHoursForDay = 0;
     }
     var num = my_events[title];
