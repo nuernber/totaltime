@@ -47,6 +47,7 @@ function getTimeDiffInHours(start, end)
 
 function eventCallback(response) {
   var my_events = new Array();
+  var my_event_days = new Array();
   //var out1 = '';
   //for(prop in response)
   //{
@@ -64,18 +65,106 @@ function eventCallback(response) {
         my_events[e.title] += time_length;
       } else {
         my_events[e.title] = time_length;
+        my_event_days[e.title] = e.startTime.date;
       }
     }
   }
+
+  var c = document.getElementById("myCustomContainer");
+  var x = document.createElement("TABLE");
+  x.setAttribute("id", "weeklyTotalTable");
+  x.setAttribute("style", "table-layout: fixed; border-collapse: collapse; width: 100%; max-width: 140px; border: 0px");
+  c.appendChild(x);
+
+  var i = 0;
+  var currentDayOfMonth = 0;
+  var totalHoursForDay = 0;
+  var grandTotal = 0;
   for(title in my_events) {
+
+    if (currentDayOfMonth == 0)
+      currentDayOfMonth = my_event_days[title];
+
+    if (currentDayOfMonth != my_event_days[title])
+    {
+      currentDayOfMonth = my_event_days[title];
+
+      var y = document.createElement("TR");
+      y.setAttribute("id", "weekly_row_" + i);
+      document.getElementById("weeklyTotalTable").appendChild(y);
+
+      var z = document.createElement("TD");
+      z.setAttribute("style", "width: 78px; overflow: hidden; white-space: nowrap;");
+      var t = document.createTextNode("Total for " + currentDayOfMonth);
+      z.appendChild(t);
+      document.getElementById("weekly_row_" + i).appendChild(z);
+
+      z = document.createElement("TD");
+      z.setAttribute("style", "width: 29px; overflow: hidden; white-space: nowrap;");
+      t = document.createTextNode(" ");
+      z.appendChild(t);
+      document.getElementById("weekly_row_" + i).appendChild(z);
+
+      z = document.createElement("TD");
+      z.setAttribute("style", "width: 29px; overflow: hidden; white-space: nowrap;");
+      t = document.createTextNode(totalHoursForDay.toFixed(2));
+      z.appendChild(t);
+      document.getElementById("weekly_row_" + i).appendChild(z);
+
+      i++;
+
+      totalHoursForDay = 0;
+    }
     var num = my_events[title];
-    num = num.toFixed(2);
-    out += title + ": " + num + " hours";
-    //out += "<br>";
-    out += "\n";
+    totalHoursForDay += num;
+    grandTotal += num;
+
+    var y = document.createElement("TR");
+    y.setAttribute("id", "weekly_row_" + i);
+    document.getElementById("weeklyTotalTable").appendChild(y);
+
+    var z = document.createElement("TD");
+    z.setAttribute("style", "width: 78px; overflow: hidden; white-space: nowrap;");
+    var t = document.createTextNode(title);
+    z.appendChild(t);
+    document.getElementById("weekly_row_" + i).appendChild(z);
+
+    z = document.createElement("TD");
+    z.setAttribute("style", "width: 29px; overflow: hidden; white-space: nowrap;");
+    t = document.createTextNode(num.toFixed(2));
+    z.appendChild(t);
+    document.getElementById("weekly_row_" + i).appendChild(z);
+
+    z = document.createElement("TD");
+    z.setAttribute("style", "width: 29px; overflow: hidden; white-space: nowrap;");
+    t = document.createTextNode(" ");
+    z.appendChild(t);
+    document.getElementById("weekly_row_" + i).appendChild(z);
+
+    i++;
   }
-  //document.body.innerHTML += out;
-  document.getElementById("times").value += out + "\n";
+
+  var y = document.createElement("TR");
+  y.setAttribute("id", "weekly_row_" + i);
+  document.getElementById("weeklyTotalTable").appendChild(y);
+
+  var z = document.createElement("TD");
+  z.setAttribute("style", "width: 78px; overflow: hidden; white-space: nowrap;");
+  var t = document.createTextNode("Weekly Total");
+  z.appendChild(t);
+  document.getElementById("weekly_row_" + i).appendChild(z);
+
+  z = document.createElement("TD");
+  z.setAttribute("style", "width: 29px; overflow: hidden; white-space: nowrap;");
+  t = document.createTextNode(" ");
+  z.appendChild(t);
+  document.getElementById("weekly_row_" + i).appendChild(z);
+
+  z = document.createElement("TD");
+  z.setAttribute("style", "width: 29px; overflow: hidden; white-space: nowrap;");
+  t = document.createTextNode(grandTotal.toFixed(2));
+  z.appendChild(t);
+  document.getElementById("weekly_row_" + i).appendChild(z);
 }
 
 function getWeekStart()
@@ -116,11 +205,12 @@ function readEvents()
 }
 </script>
 Calendar ID:
-<input type="text" id="eventid"/><br/>
+<input type="text" id="eventid" size="6"/><br/>
 <input type="button" onclick="readEvents()" value="Refresh"/><br/>
 <a href="http://bit.ly/OsO3ka" target="_blank">
 How to use</a><br/>
-<textarea id="times" style="font-size:8pt; font-face: Verdana;" cols="18" rows="7"></textarea>
+<div id="myCustomContainer" style="overflow-y:scroll; height:144px">
+</div>
 </body>
 </html>
 ]]></Content>
